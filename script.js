@@ -19,3 +19,7 @@ const Gameboard = (function () {
     },
   };
 })();
+
+function createPlayer(name, mark) {
+  return { name, mark };
+}
