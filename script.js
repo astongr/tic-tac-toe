@@ -5,7 +5,7 @@ const Gameboard = (function () {
 
   return {
     getBoard: function () {
-      return myBoard;
+      return [...myBoard];
     },
     resetBoard: function () {
       myBoard.fill("");
@@ -57,9 +57,11 @@ const gameController = (function () {
     return false;
   }
 
-  function checkTie() {
+  function getGameStatus() {
     const board = Gameboard.getBoard();
-    return !board.includes("") && !checkWin();
+    if (checkWin()) return "win";
+    if (!board.includes("")) return "draw";
+    return "in-play";
   }
 
   return {
@@ -74,18 +76,19 @@ const gameController = (function () {
         return;
       }
 
-      if (checkWin()) {
-        console.log(`${currentPlayer.name} Wins!`);
-        gameOver = true;
-        return;
+      const status = getGameStatus();
+      switch (status) {
+        case "win":
+          console.log(`${currentPlayer.name} Wins!`);
+          gameOver = true;
+          break;
+        case "draw":
+          console.log("It's a draw! Reset the board and play again!");
+          gameOver = true;
+          break;
+        default:
+          currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
       }
-
-      if (checkTie()) {
-        console.log("The game is a Draw!");
-        gameOver = true;
-        return;
-      }
-      currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
     },
     resetGame: function () {
       Gameboard.resetBoard();
