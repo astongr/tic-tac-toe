@@ -13,8 +13,9 @@ const Gameboard = (function () {
     placeMark: function (index, mark) {
       if (myBoard[index] === "") {
         myBoard[index] = mark;
+        return true;
       } else {
-        console.log("Sorry, that place on the grid is taken! Choose another.");
+        return false;
       }
     },
   };
@@ -67,7 +68,12 @@ const gameController = (function () {
         console.log("Game is over - start a new game!");
         return;
       }
-      Gameboard.placeMark(index, currentPlayer.mark);
+      const moveLanded = Gameboard.placeMark(index, currentPlayer.mark);
+      if (!moveLanded) {
+        console.log("Sorry, that place on the grid is taken! Choose another.");
+        return;
+      }
+
       if (checkWin()) {
         console.log(`${currentPlayer.name} Wins!`);
         gameOver = true;
