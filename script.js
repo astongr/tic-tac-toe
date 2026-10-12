@@ -94,3 +94,30 @@ const gameController = (function () {
     },
   };
 })();
+
+const displayController = (function () {
+  const gameboard = document.getElementById("gameboard");
+
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement("button");
+    cell.dataset.index = i;
+    gameboard.appendChild(cell);
+  }
+
+  function render() {
+    const board = Gameboard.getBoard();
+    for (let i = 0; i < board.length; i++) {
+      const cell = document.querySelector(`[data-index="${i}"]`);
+      cell.textContent = board[i];
+    }
+  }
+
+  gameboard.addEventListener("click", function (e) {
+    const clickedCell = e.target;
+    const index = Number(clickedCell.dataset.index);
+    gameController.playRound(index);
+    render();
+  });
+
+  return { render };
+})();
