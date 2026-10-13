@@ -5,7 +5,7 @@ const Gameboard = (function () {
 
   return {
     getBoard: function () {
-      return myBoard;
+      return [...myBoard];
     },
     resetBoard: function () {
       myBoard.fill("");
@@ -31,6 +31,7 @@ const gameController = (function () {
   const playerTwo = createPlayer("Player Two", "O");
   let currentPlayer = playerOne;
   let gameOver = false;
+  const STATUS = { WIN: "win", DRAW: "draw", IN_PLAY: "in-play" };
   const winningLines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -57,9 +58,11 @@ const gameController = (function () {
     return false;
   }
 
-  function checkTie() {
+  function getGameStatus() {
     const board = Gameboard.getBoard();
-    return !board.includes("") && !checkWin();
+    if (checkWin()) return STATUS.WIN;
+    if (!board.includes("")) return STATUS.DRAW;
+    return STATUS.IN_PLAY;
   }
 
   return {
@@ -74,18 +77,22 @@ const gameController = (function () {
         return;
       }
 
-      if (checkWin()) {
-        console.log(`${currentPlayer.name} Wins!`);
-        gameOver = true;
-        return;
+      const status = getGameStatus();
+      switch (status) {
+        case STATUS.WIN:
+          console.log(`${currentPlayer.name} Wins!`);
+          gameOver = true;
+          break;
+        case STATUS.DRAW:
+          console.log("It's a draw! Reset the board and play again!");
+          gameOver = true;
+          break;
+        case STATUS.IN_PLAY:
+          currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
+          break;
+        default:
+          console.error(`Unexpected game status: ${status}`);
       }
-
-      if (checkTie()) {
-        console.log("The game is a Draw!");
-        gameOver = true;
-        return;
-      }
-      currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
     },
     resetGame: function () {
       Gameboard.resetBoard();
