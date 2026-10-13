@@ -31,6 +31,7 @@ const gameController = (function () {
   const playerTwo = createPlayer("Player Two", "O");
   let currentPlayer = playerOne;
   let gameOver = false;
+  const STATUS = { WIN: "win", DRAW: "draw", IN_PLAY: "in-play" };
   const winningLines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -59,9 +60,9 @@ const gameController = (function () {
 
   function getGameStatus() {
     const board = Gameboard.getBoard();
-    if (checkWin()) return "win";
-    if (!board.includes("")) return "draw";
-    return "in-play";
+    if (checkWin()) return STATUS.WIN;
+    if (!board.includes("")) return STATUS.DRAW;
+    return STATUS.IN_PLAY;
   }
 
   return {
@@ -78,16 +79,19 @@ const gameController = (function () {
 
       const status = getGameStatus();
       switch (status) {
-        case "win":
+        case STATUS.WIN:
           console.log(`${currentPlayer.name} Wins!`);
           gameOver = true;
           break;
-        case "draw":
+        case STATUS.DRAW:
           console.log("It's a draw! Reset the board and play again!");
           gameOver = true;
           break;
-        default:
+        case STATUS.IN_PLAY:
           currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
+          break;
+        default:
+          console.error(`Unexpected game status: ${status}`);
       }
     },
     resetGame: function () {
