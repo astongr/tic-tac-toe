@@ -101,3 +101,33 @@ const gameController = (function () {
     },
   };
 })();
+
+const displayController = (function () {
+  const gameboard = document.getElementById("gameboard");
+
+  const board = Gameboard.getBoard();
+  for (let i = 0; i < board.length; i++) {
+    const cell = document.createElement("button");
+    cell.dataset.index = i;
+    gameboard.appendChild(cell);
+  }
+
+  function render() {
+    const board = Gameboard.getBoard();
+    for (let i = 0; i < board.length; i++) {
+      const cell = gameboard.querySelector(`[data-index="${i}"]`);
+      cell.textContent = board[i];
+    }
+  }
+  render();
+
+  gameboard.addEventListener("click", function (e) {
+    if (!e.target.matches("button")) return;
+    const clickedCell = e.target;
+    const index = Number(clickedCell.dataset.index);
+    gameController.playRound(index);
+    render();
+  });
+
+  return { render };
+})();

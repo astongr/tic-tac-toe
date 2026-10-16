@@ -1,0 +1,12 @@
+#gameboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 300px;
+    gap: 5px;
+}
+
+#gameboard button {
+    height: 100px;
+    font-size: 2rem;
+    cursor: pointer;
+}
