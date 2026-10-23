@@ -109,6 +109,7 @@ const gameController = (function () {
 const displayController = (function () {
   const gameboard = document.getElementById("gameboard");
   const statusDisplay = document.getElementById("status");
+  const restartButton = document.getElementById("restart-btn");
 
   const board = Gameboard.getBoard();
   for (let i = 0; i < board.length; i++) {
@@ -132,6 +133,12 @@ const displayController = (function () {
   render();
   showTurn();
 
+  restartButton.addEventListener("click", function () {
+    gameController.resetGame();
+    render();
+    showTurn();
+  });
+
   gameboard.addEventListener("click", function (e) {
     if (!e.target.matches("button")) return;
     const clickedCell = e.target;
@@ -145,11 +152,12 @@ const displayController = (function () {
         break;
 
       case "win":
-        statusDisplay.textContent = `${result.player.name} Wins!`;
+        statusDisplay.textContent = `${result.player.name} wins! Click Restart to play again.`;
         break;
 
       case "draw":
-        statusDisplay.textContent = "The game is a draw!";
+        statusDisplay.textContent =
+          "The game is a draw! Click Restart to play again.";
         break;
     }
   });
