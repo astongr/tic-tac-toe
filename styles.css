@@ -154,3 +154,32 @@ h1 {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+/* Signature: avatar + name pinned to the bottom-right corner */
+.signature {
+  position: fixed;
+  bottom: 1rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--light);
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+}
+
+/* On narrow screens, drop the signature into the normal flow below the
+   game so it can't sit on top of the board or buttons */
+@media (max-width: 600px) {
+  .signature {
+    position: static;
+    margin-top: 1.5rem;
+  }
+}
