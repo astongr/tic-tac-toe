@@ -145,6 +145,7 @@ const displayController = (function () {
     gameController.resetGame();
     render();
     showTurn();
+    gameboard.classList.remove("game-over");
   }
 
   restartButton.addEventListener("click", startNewGame);
@@ -179,11 +180,13 @@ const displayController = (function () {
 
       case "win":
         statusDisplay.textContent = `${result.player.name} wins! Click Restart to play again.`;
+        gameboard.classList.add("game-over");
         break;
 
       case "draw":
         statusDisplay.textContent =
           "The game is a draw! Click Restart to play again.";
+        gameboard.classList.add("game-over");
         break;
     }
   });
