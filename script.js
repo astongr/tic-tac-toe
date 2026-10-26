@@ -68,42 +68,47 @@ const gameController = (function () {
   return {
     playRound: function (index) {
       if (gameOver) {
-        console.log("Game is over - start a new game!");
-        return;
+        return { status: getGameStatus(), player: currentPlayer };
       }
       const moveLanded = Gameboard.placeMark(index, currentPlayer.mark);
       if (!moveLanded) {
-        console.log("Sorry, that place on the grid is taken! Choose another.");
-        return;
+        return { status: STATUS.IN_PLAY, player: currentPlayer };
       }
 
       const status = getGameStatus();
       switch (status) {
         case STATUS.WIN:
-          console.log(`${currentPlayer.name} Wins!`);
           gameOver = true;
-          break;
+          return { status: STATUS.WIN, player: currentPlayer };
+
         case STATUS.DRAW:
-          console.log("It's a draw! Reset the board and play again!");
           gameOver = true;
-          break;
+          return { status: STATUS.DRAW, player: currentPlayer };
+
         case STATUS.IN_PLAY:
           currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
-          break;
+          return { status: STATUS.IN_PLAY, player: currentPlayer };
+
         default:
           console.error(`Unexpected game status: ${status}`);
       }
     },
+
     resetGame: function () {
       Gameboard.resetBoard();
       gameOver = false;
       currentPlayer = playerOne;
+    },
+
+    getCurrentPlayer: function () {
+      return currentPlayer;
     },
   };
 })();
 
 const displayController = (function () {
   const gameboard = document.getElementById("gameboard");
+  const statusDisplay = document.getElementById("status");
 
   const board = Gameboard.getBoard();
   for (let i = 0; i < board.length; i++) {
@@ -119,15 +124,34 @@ const displayController = (function () {
       cell.textContent = board[i];
     }
   }
+
+  function showTurn() {
+    const currentPlayer = gameController.getCurrentPlayer();
+    statusDisplay.textContent = `${currentPlayer.name}'s turn!`;
+  }
   render();
+  showTurn();
 
   gameboard.addEventListener("click", function (e) {
     if (!e.target.matches("button")) return;
     const clickedCell = e.target;
     const index = Number(clickedCell.dataset.index);
-    gameController.playRound(index);
+    const result = gameController.playRound(index);
     render();
-  });
 
+    switch (result.status) {
+      case "in-play":
+        showTurn();
+        break;
+
+      case "win":
+        statusDisplay.textContent = `${result.player.name} Wins!`;
+        break;
+
+      case "draw":
+        statusDisplay.textContent = "The game is a draw!";
+        break;
+    }
+  });
   return { render };
 })();
