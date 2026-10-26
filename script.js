@@ -103,6 +103,10 @@ const gameController = (function () {
     getCurrentPlayer: function () {
       return currentPlayer;
     },
+    setPlayerNames: function (nameOne, nameTwo) {
+      playerOne.name = nameOne;
+      playerTwo.name = nameTwo;
+    },
   };
 })();
 
@@ -110,6 +114,12 @@ const displayController = (function () {
   const gameboard = document.getElementById("gameboard");
   const statusDisplay = document.getElementById("status");
   const restartButton = document.getElementById("restart-btn");
+  const nameForm = document.getElementById("name-form");
+  const playerOneInput = document.getElementById("player-one-name");
+  const playerTwoInput = document.getElementById("player-two-name");
+  const startSection = document.getElementById("start-section");
+  const gameSection = document.getElementById("game-section");
+  const changePlayersButton = document.getElementById("change-players-btn");
 
   const board = Gameboard.getBoard();
   for (let i = 0; i < board.length; i++) {
@@ -130,13 +140,29 @@ const displayController = (function () {
     const currentPlayer = gameController.getCurrentPlayer();
     statusDisplay.textContent = `${currentPlayer.name}'s turn!`;
   }
-  render();
-  showTurn();
 
-  restartButton.addEventListener("click", function () {
+  function startNewGame() {
     gameController.resetGame();
     render();
     showTurn();
+  }
+
+  restartButton.addEventListener("click", startNewGame);
+
+  nameForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const nameOne = playerOneInput.value.trim() || "Player One";
+    const nameTwo = playerTwoInput.value.trim() || "Player Two";
+    gameController.setPlayerNames(nameOne, nameTwo);
+    startSection.hidden = true;
+    gameSection.hidden = false;
+    startNewGame();
+  });
+
+  changePlayersButton.addEventListener("click", function () {
+    startSection.hidden = false;
+    gameSection.hidden = true;
+    playerOneInput.focus();
   });
 
   gameboard.addEventListener("click", function (e) {

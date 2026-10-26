@@ -8,10 +8,33 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-    <div id="gameboard">
-    </div>
-    <div id="status">
-    </div>
-    <button id="restart-btn">Restart</button>
+    <section id="start-section">
+      <form id="name-form">
+        <label for="player-one-name">Player 1 (X)</label>
+        <input
+          type="text"
+          id="player-one-name"
+          name="playerOne"
+          maxlength="15"
+          autofocus
+          placeholder="Player One" />
+
+        <label for="player-two-name">Player 2 (O)</label>
+        <input
+          type="text"
+          id="player-two-name"
+          name="playerTwo"
+          maxlength="15"
+          placeholder="Player Two" />
+
+        <button type="submit" class="start-button">Start Game!</button>
+      </form>
+    </section>
+    <section id="game-section" hidden>
+      <div id="gameboard"></div>
+      <div id="status"></div>
+      <button id="restart-btn">Restart</button>
+      <button id="change-players-btn">Change Players</button>
+    </section>
   </body>
 </html>
