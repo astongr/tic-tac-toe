@@ -1,6 +1,7 @@
 //* logic to create gameboard and its functions *//
 
 const Gameboard = (function () {
+  // IIFE runs once and hands back the functions below - myBoard stays private in here
   const myBoard = ["", "", "", "", "", "", "", "", ""];
 
   return {
@@ -10,6 +11,7 @@ const Gameboard = (function () {
     resetBoard: function () {
       myBoard.fill("");
     },
+    // only drops a mark on an empty square - true if it landed, false if taken
     placeMark: function (index, mark) {
       if (myBoard[index] === "") {
         myBoard[index] = mark;
@@ -26,12 +28,14 @@ function createPlayer(name, mark) {
   return { name, mark };
 }
 
+//* runs the game - holds the players, whose turn it is, and spots a win/draw *//
 const gameController = (function () {
   const playerOne = createPlayer("Player One", "X");
   const playerTwo = createPlayer("Player Two", "O");
   let currentPlayer = playerOne;
   let gameOver = false;
   const STATUS = { WIN: "win", DRAW: "draw", IN_PLAY: "in-play" };
+  // every possible 3-in-a-row: rows, columns, then the two diagonals
   const winningLines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -43,6 +47,7 @@ const gameController = (function () {
     [2, 4, 6],
   ];
 
+  // true if any winning line is three of the same (non-empty) mark
   function checkWin() {
     const board = Gameboard.getBoard();
     for (let i = 0; i < winningLines.length; i++) {
@@ -58,6 +63,7 @@ const gameController = (function () {
     return false;
   }
 
+  // where's the game at? win, board full = draw, otherwise still playing
   function getGameStatus() {
     const board = Gameboard.getBoard();
     if (checkWin()) return STATUS.WIN;
@@ -66,11 +72,14 @@ const gameController = (function () {
   }
 
   return {
+    // plays one move and RETURNS { status, player } - the display reads this to know what to show
     playRound: function (index) {
+      // game's already finished - don't do anything, just report where it ended
       if (gameOver) {
         return { status: getGameStatus(), player: currentPlayer };
       }
       const moveLanded = Gameboard.placeMark(index, currentPlayer.mark);
+      // clicked a taken square - nothing changes, still this player's turn
       if (!moveLanded) {
         return { status: STATUS.IN_PLAY, player: currentPlayer };
       }
@@ -78,6 +87,7 @@ const gameController = (function () {
       const status = getGameStatus();
       switch (status) {
         case STATUS.WIN:
+          // checked BEFORE swapping, so currentPlayer is still the winner
           gameOver = true;
           return { status: STATUS.WIN, player: currentPlayer };
 
@@ -86,6 +96,7 @@ const gameController = (function () {
           return { status: STATUS.DRAW, player: currentPlayer };
 
         case STATUS.IN_PLAY:
+          // no win/draw yet - swap over so player handed back is who's up NEXT
           currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
           return { status: STATUS.IN_PLAY, player: currentPlayer };
 
@@ -110,7 +121,9 @@ const gameController = (function () {
   };
 })();
 
+//* everything to do with the screen - reads the game and updates the page *//
 const displayController = (function () {
+  // grab all the page elements once up top so we can reuse them
   const gameboard = document.getElementById("gameboard");
   const statusDisplay = document.getElementById("status");
   const restartButton = document.getElementById("restart-btn");
@@ -121,6 +134,7 @@ const displayController = (function () {
   const gameSection = document.getElementById("game-section");
   const changePlayersButton = document.getElementById("change-players-btn");
 
+  // build the 9 clickable cells and tag each with its board index
   const board = Gameboard.getBoard();
   for (let i = 0; i < board.length; i++) {
     const cell = document.createElement("button");
@@ -128,6 +142,7 @@ const displayController = (function () {
     gameboard.appendChild(cell);
   }
 
+  // board is the source of truth - redraw every cell from it
   function render() {
     const board = Gameboard.getBoard();
     for (let i = 0; i < board.length; i++) {
@@ -136,11 +151,13 @@ const displayController = (function () {
     }
   }
 
+  // show whose go it is
   function showTurn() {
     const currentPlayer = gameController.getCurrentPlayer();
     statusDisplay.textContent = `${currentPlayer.name}'s turn!`;
   }
 
+  // fresh game: reset state, redraw the empty board, show first turn, unlock the board
   function startNewGame() {
     gameController.resetGame();
     render();
@@ -150,6 +167,7 @@ const displayController = (function () {
 
   restartButton.addEventListener("click", startNewGame);
 
+  // take the entered names (fall back to defaults if blank), then start the game
   nameForm.addEventListener("submit", function (e) {
     e.preventDefault();
     const nameOne = playerOneInput.value.trim() || "Player One";
@@ -166,6 +184,7 @@ const displayController = (function () {
     playerOneInput.focus();
   });
 
+  // one listener on the whole board (delegation) - figure out which cell got clicked
   gameboard.addEventListener("click", function (e) {
     if (!e.target.matches("button")) return;
     const clickedCell = e.target;
@@ -173,8 +192,10 @@ const displayController = (function () {
     const result = gameController.playRound(index);
     render();
 
+    // react to what playRound told us
     switch (result.status) {
       case "in-play":
+        // player on result is who's up NEXT, so show their turn
         showTurn();
         break;
 
